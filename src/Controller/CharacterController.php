@@ -4,13 +4,12 @@ namespace App\Controller;
 
 use App\Entity\Character;
 use App\Repository\CharacterRepository;
-use DateTime;
+use App\Requests\CharacterRequest;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Doctrine\Persistence\ManagerRegistry;
-use Symfony\Component\HttpFoundation\Request;
 
 class CharacterController extends AbstractController
 {
@@ -37,11 +36,11 @@ class CharacterController extends AbstractController
     }
 
     #[Route('/characters', name: 'characters_create', methods: ['POST'])]
-    public function create(Request $request): JsonResponse
+    public function create(CharacterRequest $request): JsonResponse
     {
-        $data = json_decode($request->getContent(), true);
+        $validated = $request->validated();
 
-        $this->repository->save($data);
+        $this->repository->save($validated);
 
         return $this->json([], Response::HTTP_CREATED);
     }
