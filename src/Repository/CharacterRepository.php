@@ -3,7 +3,9 @@
 namespace App\Repository;
 
 use App\Entity\Character;
+use DateTime;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
+use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\Persistence\ManagerRegistry;
 
 /**
@@ -16,19 +18,37 @@ use Doctrine\Persistence\ManagerRegistry;
  */
 class CharacterRepository extends ServiceEntityRepository
 {
-    public function __construct(ManagerRegistry $registry)
-    {
+    public function __construct(
+        ManagerRegistry $registry,
+        EntityManagerInterface $manager
+    ) {
         parent::__construct($registry, Character::class);
+        $this->manager = $manager;
     }
 
-    public function save(Character $entity, bool $flush = false): void
+    public function save(array $fields)
     {
-        $this->getEntityManager()->persist($entity);
+        $character = new Character();
 
-        if ($flush) {
-            $this->getEntityManager()->flush();
-        }
+        $character
+            ->setName($fields['name'])
+            ->setSlug($fields['slug'])
+            ->setDescription($fields['description'] ?? null)
+            ->setGender($fields['gender'])
+            ->setBirthday(new DateTime($fields['birthday']));
+
+        $this->manager->persist($character);
+        $this->manager->flush();
     }
+
+    // public function save(Character $entity, bool $flush = false): void
+    // {
+    //     $this->getEntityManager()->persist($entity);
+
+    //     if ($flush) {
+    //         $this->getEntityManager()->flush();
+    //     }
+    // }
 
     public function remove(Character $entity, bool $flush = false): void
     {
