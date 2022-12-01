@@ -14,10 +14,12 @@ use Symfony\Component\HttpFoundation\Request;
 
 class CharacterController extends AbstractController
 {
+    private CharacterRepository $repository;
+
     public function __construct(ManagerRegistry $doctrine)
     {
-        $this->manager = $doctrine->getManager();
-        $this->repository = $this->manager->getRepository(Character::class);
+        $manager = $doctrine->getManager();
+        $this->repository = $manager->getRepository(Character::class);
     }
 
     #[Route('/characters', name: 'character_list', methods: ['GET'])]
